@@ -31,6 +31,15 @@ app.get("/comercios/:id", async (req, res) => {
   const comercio = await Comercio.findByPk(req.params.id);
   res.json(comercio);
 });
+app.get("/comercios-cerca-de", async (req, res) => {
+  // query params -> lat&lng
+  const { lat, lng } = req.query;
+  const algoliaRes = await index.search("", {
+    aroundLatLng: `${lat}, ${lng}`,
+    aroundRadius: 1000000, // 10 km
+  });
+  res.json(algoliaRes);
+});
 app.put("/comercios/:id", async (req, res) => {
   const comercio = await Comercio.update(req.body, {
     where: {
@@ -42,5 +51,7 @@ app.put("/comercios/:id", async (req, res) => {
   const algoliaRes = await index.partialUpdateObject(objectData);
   res.json(comercio);
 });
+
+app.get("*", express.static(__dirname + "/public"));
 
 app.listen(port, () => console.log("escuchando puerto" + port));
